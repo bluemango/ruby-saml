@@ -29,5 +29,19 @@ class RequestTest < Test::Unit::TestCase
       auth_url = Onelogin::Saml::Authrequest.new.create(settings, { :hello => nil })
       assert auth_url =~ /&hello=$/
     end
+    
+    should "propery encode the query params if query params already exist in sso_target_url" do
+      settings = Onelogin::Saml::Settings.new
+      settings.idp_sso_target_url = "http://stuff.com?name=bob"
+      
+      auth_url = Onelogin::Saml::Authrequest.new.create(settings)
+      assert auth_url =~ /^http:\/\/stuff\.com\?name=bob\&SAMLRequest=/
+
+      auth_url = Onelogin::Saml::Authrequest.new.create(settings, { :hello => "there" })
+      assert auth_url =~ /&hello=there$/
+
+      auth_url = Onelogin::Saml::Authrequest.new.create(settings, { :hello => nil })
+      assert auth_url =~ /&hello=$/
+    end
   end
 end
